@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.SchoolRollManagement.mapper.ClasseMapper">
+
+    <resultMap type="com.design.SchoolRollManagement.pojo.Classe" id="ClasseMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="historyId" column="history_id" jdbcType="INTEGER"/>
+        <result property="classeId" column="classe_id" jdbcType="INTEGER"/>
+        <result property="professionId" column="profession_id" jdbcType="INTEGER"/>
+        <result property="year" column="year" jdbcType="INTEGER"/>
+        <result property="professionName" column="profession_name" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="className" column="class_name" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ClasseMap">
+        select
+     *
+        from classe
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into classe(profession_id, class_name,created_at,created_by)
+        values (#{professionId}, #{className},now(),#{createdBy})
+    </insert>
+     <!--分页查询-->
+      <select id="getPageListByCondition" resultMap="ClasseMap">
+        select a.*,a.id as classe_id,b.year,b.id as history_id,c.name as profession_name,d.user_name, d.id as user_id from classe a ,classe_history b,profession c,users d
+          where  a.profession_id = c.id and a.id= b.classe_id and d.id=b.user_id
+          <if test="page.key.professionId != null ">
+              and a.profession_id = #{page.key.professionId}
+          </if>
+          <if test="page.key.classeId != null ">
+              and a.id = #{page.key.classeId}
+          </if>
+          <if test="page.key.year != null ">
+              and b.year = #{page.key.year}
+          </if>
+   order by
+   a.created_at desc
+   <!--分页查询-->
+        <!--比如 pageNum=1 pageSize=10为 第一页开始 查10条数据 ((#{page.pageNum}-1)*#{page.pageSize})=0*10,10 则表示从1开始查10条数据-->
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(a.id) as count from classe a ,classe_history b,profession c,users d
+        where  a.profession_id = c.id and a.id= b.classe_id and d.id=b.user_id
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+        <if test="page.key.year != null ">
+            and b.year = #{page.key.year}
+        </if>
+    </select>
+    <!--分页查询-->
+    <select id="getPageClassListByCondition" resultMap="ClasseMap">
+        select a.*,c.name as profession_name  from classe a ,profession c
+        where  a.profession_id = c.id
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+        order by
+        a.created_at desc
+        <!--分页查询-->
+        <!--比如 pageNum=1 pageSize=10为 第一页开始 查10条数据 ((#{page.pageNum}-1)*#{page.pageSize})=0*10,10 则表示从1开始查10条数据-->
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+    <!--分页查询条数-->
+    <select id="getPageClassListCount" resultType="int">
+        select count(a.id) as count from classe a ,profession c
+        where  a.profession_id = c.id
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+    </select>
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update classe
+        <set>
+            <if test="professionId != null">
+                profession_id = #{professionId},
+            </if>
+            <if test="className != null and className != ''">
+                class_name = #{className},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from classe where id = #{id}
+    </delete>
+  <select id="getByprofessionId" resultMap="ClasseMap">
+      select * from classe where profession_id = #{professionId}
+  </select>
+</mapper>
+

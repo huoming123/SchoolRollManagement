@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.SchoolRollManagement.mapper.LeaveSchoolMapper">
+
+    <resultMap type="com.design.SchoolRollManagement.pojo.LeaveSchool" id="LeaveSchoolMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="professionId" column="profession_id" jdbcType="INTEGER"/>
+        <result property="classeId" column="classe_id" jdbcType="INTEGER"/>
+        <result property="checked" column="checked" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="diploma" column="diploma" jdbcType="VARCHAR"/>
+        <result property="diplomaImages" column="diploma_images" jdbcType="VARCHAR"/>
+        <result property="registrationCard" column="registration_card" jdbcType="VARCHAR"/>
+        <result property="registrationCardImages" column="registration_card_images" jdbcType="VARCHAR"/>
+        <result property="year" column="year" jdbcType="INTEGER"/>
+        <result property="classTeacher" column="class_teacher" jdbcType="VARCHAR"/>
+        <result property="leavingCertificate" column="leaving_certificate" jdbcType="VARCHAR"/>
+        <result property="professionName" column="profession_name" jdbcType="VARCHAR"/>
+        <result property="className" column="class_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="LeaveSchoolMap">
+        select
+          id, user_id, created_by, created_at, profession_id, classe_id, checked, status, diploma, diploma_images, registration_card, registration_card_images, year, class_teacher, leaving_certificate
+        from leave_school
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into leave_school(user_id, created_by, created_at, profession_id, classe_id, checked, status, diploma, diploma_images, registration_card, registration_card_images, year, class_teacher, leaving_certificate)
+        values (#{userId}, #{createdBy}, #{createdAt}, #{professionId}, #{classeId}, 0, 0, #{diploma}, #{diplomaImages}, #{registrationCard}, #{registrationCardImages}, #{year}, #{classTeacher}, #{leavingCertificate})
+    </insert>
+        <!--用select进行分页查询-->
+      <select id="getPageListByCondition" resultMap="LeaveSchoolMap">
+
+          select a.*,b.name as profession_name,c.class_name  from leave_school a, profession b, classe c where a.classe_id=c.id and a.profession_id=b.id
+          <!--专业搜索 不为空 则进入搜索条件-->
+          <if test="page.key.professionId != null ">
+              and a.profession_id = #{page.key.professionId}
+          </if>
+          <!--班级搜索 不为空 则进入搜索条件-->
+          <if test="page.key.classeId != null ">
+              and a.classe_id = #{page.key.classeId}
+          </if>
+          <!--教务处搜索 不为空 则进入搜索条件-->
+          <if test="page.key.status != null ">
+              and a.status = #{page.key.status}
+          </if>
+          <!--班主任核实搜索 不为空 则进入搜索条件-->
+          <if test="page.key.checked != null ">
+              and a.checked = #{page.key.checked}
+          </if>
+          <!--学生搜索 不为空 则进入搜索条件-->
+          <if test="page.key.userId != null ">
+              and a.user_id = #{page.key.userId}
+          </if>
+          <!--年份搜索 不为空 则进入搜索条件-->
+          <if test="page.key.year != null ">
+              and a.year = #{page.key.year}
+          </if>
+          <!--班主任搜索 不为空 则进入搜索条件-->
+          <if test="page.key.classTeacher != null and page.key.classTeacher != null">
+              and a.class_teacher = #{page.key.classTeacher}
+          </if>
+
+            <!--排序 desc是降序-->
+        order by
+        a.created_at desc
+        <!--分页查询-->
+      
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(a.id) as count  from leave_school a, profession b, classe c where a.classe_id=c.id and a.profession_id=b.id
+        <!--专业搜索 不为空 则进入搜索条件-->
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+        <!--班级搜索 不为空 则进入搜索条件-->
+        <if test="page.key.classeId != null ">
+            and a.classe_id = #{page.key.classeId}
+        </if>
+        <!--教务处搜索 不为空 则进入搜索条件-->
+        <if test="page.key.status != null ">
+            and a.status = #{page.key.status}
+        </if>
+        <!--班主任核实搜索 不为空 则进入搜索条件-->
+        <if test="page.key.checked != null ">
+            and a.checked = #{page.key.checked}
+        </if>
+        <!--学生搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userId != null ">
+            and a.user_id = #{page.key.userId}
+        </if>
+        <!--年份搜索 不为空 则进入搜索条件-->
+        <if test="page.key.year != null ">
+            and a.year = #{page.key.year}
+        </if>
+        <!--班主任搜索 不为空 则进入搜索条件-->
+        <if test="page.key.classTeacher != null and page.key.classTeacher != null">
+            and a.class_teacher = #{page.key.classTeacher}
+        </if>
+    </select>
+
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update leave_school
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="professionId != null">
+                profession_id = #{professionId},
+            </if>
+            <if test="classeId != null">
+                classe_id = #{classeId},
+            </if>
+            <if test="checked != null">
+                checked = #{checked},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="diploma != null and diploma != ''">
+                diploma = #{diploma},
+            </if>
+            <if test="diplomaImages != null and diplomaImages != ''">
+                diploma_images = #{diplomaImages},
+            </if>
+            <if test="registrationCard != null and registrationCard != ''">
+                registration_card = #{registrationCard},
+            </if>
+            <if test="registrationCardImages != null and registrationCardImages != ''">
+                registration_card_images = #{registrationCardImages},
+            </if>
+            <if test="year != null">
+                year = #{year},
+            </if>
+            <if test="classTeacher != null and classTeacher != ''">
+                class_teacher = #{classTeacher},
+            </if>
+            <if test="leavingCertificate != null and leavingCertificate != ''">
+                leaving_certificate = #{leavingCertificate},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from leave_school where id = #{id}
+    </delete>
+
+</mapper>
+

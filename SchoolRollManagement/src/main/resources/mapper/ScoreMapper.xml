@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.SchoolRollManagement.mapper.ScoreMapper">
+
+    <resultMap type="com.design.SchoolRollManagement.pojo.Score" id="ScoreMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="score" column="score" jdbcType="NUMERIC"/>
+        <result property="rerepairScore" column="rerepair_score" jdbcType="NUMERIC"/>
+        <result property="year" column="year" jdbcType="INTEGER"/>
+        <result property="term" column="term" jdbcType="VARCHAR"/>
+        <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="elective" column="elective" jdbcType="INTEGER"/>
+        <result property="credit" column="credit" jdbcType="INTEGER"/>
+        <result property="gradePoint" column="grade_point" jdbcType="NUMERIC"/>
+        <result property="fail" column="fail" jdbcType="INTEGER"/>
+        <result property="rerepair" column="rerepair" jdbcType="INTEGER"/>
+        <result property="pass" column="pass" jdbcType="INTEGER"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="rerepairScore" column="rerepair_score" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ScoreMap">
+        select
+         *
+        from score
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into score(user_id, score, year, term, course_name, created_at, created_by, elective, credit, grade_point, fail, rerepair, pass,rerepair_score)
+        values (#{userId}, #{score}, #{year}, #{term}, #{courseName}, now(), #{createdBy}, #{elective}, #{credit}, #{gradePoint}, #{fail}, #{rerepair}, #{pass},#{rerepairScore})
+    </insert>
+        <!--用select进行分页查询-->
+      <select id="getPageListByCondition" resultMap="ScoreMap">
+          select a.*,b.user_name from score a, users b where  a.user_id=b.id
+          <!--年份搜索 不为空 则进入搜索条件-->
+          <if test="page.key.year != null and page.key.year != ''">
+              and a.year = #{page.key.year}
+          </if>
+          <!--学生搜索 不为空 则进入搜索条件-->
+          <if test="page.key.userId != null and page.key.userId != ''">
+              and a.user_id = #{page.key.userId}
+          </if>
+          <!--学期搜索 不为空 则进入搜索条件-->
+          <if test="page.key.term != null and page.key.term != ''">
+              and a.term = #{page.key.term}
+          </if>
+          <!--班主任搜索 不为空 则进入搜索条件-->
+          <if test="page.key.createdBy != null and page.key.createdBy != ''">
+              and a.created_by = #{page.key.createdBy}
+          </if>
+          <!--挂科搜索 不为空 则进入搜索条件-->
+          <if test="page.key.fail != null">
+              and a.fail = #{page.key.fail}
+          </if>
+          <!--未通过科目搜索 不为空 则进入搜索条件-->
+          <if test="page.key.noPass == 1">
+              and (a.pass=-1 or a.pass =0)
+          </if>
+            <!--排序 desc是降序-->
+        order by
+        a.created_at desc
+        <!--分页查询-->
+      
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(a.id) as count from score a, users b where  a.user_id=b.id
+        <!--年份搜索 不为空 则进入搜索条件-->
+        <if test="page.key.year != null and page.key.year != ''">
+            and a.year = #{page.key.year}
+        </if>
+        <!--学生搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userId != null and page.key.userId != ''">
+            and a.user_id = #{page.key.userId}
+        </if>
+        <!--学期搜索 不为空 则进入搜索条件-->
+        <if test="page.key.term != null and page.key.term != ''">
+            and a.term = #{page.key.term}
+        </if>
+        <!--班主任搜索 不为空 则进入搜索条件-->
+        <if test="page.key.createdBy != null and page.key.createdBy != ''">
+            and a.created_by = #{page.key.createdBy}
+        </if>
+        <!--挂科搜索 不为空 则进入搜索条件-->
+        <if test="page.key.fail != null">
+            and a.fail = #{page.key.fail}
+        </if>
+        <!--未通过科目搜索 不为空 则进入搜索条件-->
+        <if test="page.key.noPass == 1">
+            and (a.pass=-1 or a.pass =0)
+        </if>
+    </select>
+
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update score
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="rerepairScore != null">
+                rerepair_score = #{rerepairScore},
+            </if>
+            <if test="rerepairScore != null">
+                rerepair_score = #{rerepairScore},
+            </if>
+            <if test="year != null">
+                year = #{year},
+            </if>
+            <if test="term != null and term != ''">
+                term = #{term},
+            </if>
+            <if test="courseName != null and courseName != ''">
+                course_name = #{courseName},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="elective != null">
+                elective = #{elective},
+            </if>
+            <if test="credit != null">
+                credit = #{credit},
+            </if>
+            <if test="gradePoint != null">
+                grade_point = #{gradePoint},
+            </if>
+            <if test="fail != null">
+                fail = #{fail},
+            </if>
+            <if test="rerepair != null">
+                rerepair = #{rerepair},
+            </if>
+            <if test="pass != null">
+                pass = #{pass},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from score where id = #{id}
+    </delete>
+    <!--判断是否有重复的成绩录入-->
+   <select id="getByUserID" resultMap="ScoreMap">
+       select * from score where user_id=#{userId} and term =#{term} and year =#{year} and course_name = #{courseName};
+   </select>
+    <!--获取成绩-->
+    <select id="getGradeList" resultMap="ScoreMap">
+        select a.*,b.user_name from score a, users b where  a.user_id=b.id and a.user_id=#{userId} and a.year =#{year} and a.term=#{term} ;
+    </select>
+    <!--获取学生成绩-->
+    <select id="getScoreList" resultMap="ScoreMap">
+        select * from score where user_id=#{userId}   and (pass=1 or pass =2);
+    </select>
+    <!--获取已挂科目-->
+    <select id="getScoreList1" resultMap="ScoreMap">
+        select * from score where user_id=#{userId}  and (pass=-1 or pass =0);
+    </select>
+
+</mapper>
+

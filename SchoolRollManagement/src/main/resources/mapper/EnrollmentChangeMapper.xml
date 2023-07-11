@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.SchoolRollManagement.mapper.EnrollmentChangeMapper">
+
+    <resultMap type="com.design.SchoolRollManagement.pojo.EnrollmentChange" id="EnrollmentChangeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="checked" column="checked" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="professionName" column="profession_name" jdbcType="VARCHAR"/>
+        <result property="className" column="class_name" jdbcType="VARCHAR"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="professionId" column="profession_id" jdbcType="INTEGER"/>
+        <result property="classeId" column="classe_id" jdbcType="INTEGER"/>
+        <result property="year" column="year" jdbcType="INTEGER"/>
+        <result property="classTeacher" column="class_teacher" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="EnrollmentChangeMap">
+        select
+         *
+        from enrollment_change
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into enrollment_change(user_id, created_by, created_at, type, checked, status, reason, profession_id, classe_id,year,class_teacher)
+        values (#{userId}, #{createdBy}, now(), #{type}, 0, 0, #{reason}, #{professionId}, #{classeId},#{year},#{classTeacher})
+    </insert>
+        <!--用select进行分页查询-->
+      <select id="getPageListByCondition" resultMap="EnrollmentChangeMap">
+        select a.*,b.name as profession_name,c.class_name  from enrollment_change a, profession b, classe c where a.classe_id=c.id and a.profession_id=b.id
+          <!--专业搜索 不为空 则进入搜索条件-->
+          <if test="page.key.professionId != null ">
+              and a.profession_id = #{page.key.professionId}
+          </if>
+          <!--班级搜索 不为空 则进入搜索条件-->
+          <if test="page.key.classeId != null ">
+              and a.classe_id = #{page.key.classeId}
+          </if>
+          <!--教务处搜索 不为空 则进入搜索条件-->
+          <if test="page.key.status != null ">
+              and a.status = #{page.key.status}
+          </if>
+          <!--班主任核实搜索 不为空 则进入搜索条件-->
+          <if test="page.key.checked != null ">
+              and a.checked = #{page.key.checked}
+          </if>
+          <!--学生搜索 不为空 则进入搜索条件-->
+          <if test="page.key.userId != null ">
+              and a.user_id = #{page.key.userId}
+          </if>
+          <!--年份搜索 不为空 则进入搜索条件-->
+          <if test="page.key.year != null ">
+              and a.year = #{page.key.year}
+          </if>
+          <!--班主任搜索 不为空 则进入搜索条件-->
+          <if test="page.key.classTeacher != null and page.key.classTeacher != null">
+              and a.class_teacher = #{page.key.classTeacher}
+          </if>
+            <!--排序 desc是降序-->
+        order by
+        created_at desc
+        <!--分页查询-->
+      
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(a.id) as count  from enrollment_change a, profession b, classe c where a.classe_id=c.id and a.profession_id=b.id
+        <!--专业搜索 不为空 则进入搜索条件-->
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+        <!--班级搜索 不为空 则进入搜索条件-->
+        <if test="page.key.classeId != null ">
+            and a.classe_id = #{page.key.classeId}
+        </if>
+        <!--教务处搜索 不为空 则进入搜索条件-->
+        <if test="page.key.status != null ">
+            and a.status = #{page.key.status}
+        </if>
+        <!--班主任核实搜索 不为空 则进入搜索条件-->
+        <if test="page.key.checked != null ">
+            and a.checked = #{page.key.checked}
+        </if>
+        <!--学生搜索 不为空 则进入搜索条件-->
+        <if test="page.key.userId != null ">
+            and a.user_id = #{page.key.userId}
+        </if>
+        <!--年份搜索 不为空 则进入搜索条件-->
+        <if test="page.key.year != null ">
+            and a.year = #{page.key.year}
+        </if>
+        <!--班主任搜索 不为空 则进入搜索条件-->
+        <if test="page.key.classTeacher != null and page.key.classTeacher != null">
+            and a.class_teacher = #{page.key.classTeacher}
+        </if>
+    </select>
+
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update enrollment_change
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="classTeacher != null and classTeacher != ''">
+                class_teacher = #{classTeacher},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt},
+            </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="checked != null">
+                checked = #{checked},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="reason != null and reason != ''">
+                reason = #{reason},
+            </if>
+            <if test="professionId != null">
+                profession_id = #{professionId},
+            </if>
+            <if test="classeId != null">
+                classe_id = #{classeId},
+            </if>
+            <if test="year != null">
+                year = #{year},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from enrollment_change where id = #{id}
+    </delete>
+
+</mapper>
+

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.design.SchoolRollManagement.mapper.GraduateMapper">
+
+    <resultMap type="com.design.SchoolRollManagement.pojo.Graduate" id="GraduateMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="intermediate" column="intermediate" jdbcType="VARCHAR"/>
+        <result property="advanced" column="advanced" jdbcType="VARCHAR"/>
+        <result property="levelFour" column="level_four" jdbcType="VARCHAR"/>
+        <result property="levelSix" column="level_six" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="classeId" column="classe_id" jdbcType="INTEGER"/>
+        <result property="professionId" column="profession_id" jdbcType="INTEGER"/>
+        <result property="certificate" column="certificate" jdbcType="VARCHAR"/>
+        <result property="year" column="year" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="GraduateMap">
+        select
+          *
+        from graduate
+        where id = #{id}
+    </select>
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into graduate(user_id, intermediate, advanced, level_four, level_six, status, classe_id, profession_id, certificate,year)
+        values (#{userId}, #{intermediate}, #{advanced}, #{levelFour}, #{levelSix}, 0, #{classeId}, #{professionId}, #{certificate},#{year})
+    </insert>
+        <!--用select进行分页查询-->
+      <select id="getPageListByCondition" resultMap="GraduateMap">
+        select a.*,b.user_name  from graduate a , users b where  a.user_id=b.id
+            <!--排序 desc是降序-->
+          <!--专业搜索 不为空 则进入搜索条件-->
+          <if test="page.key.professionId != null ">
+              and a.profession_id = #{page.key.professionId}
+          </if>
+          <!--班级搜索 不为空 则进入搜索条件-->
+          <if test="page.key.classeId != null ">
+              and a.classe_id = #{page.key.classeId}
+          </if>
+          <!--是否结业搜索 不为空 则进入搜索条件-->
+          <if test="page.key.status != null ">
+              and a.status = #{page.key.status}
+          </if>
+          <!--年份搜索 不为空 则进入搜索条件-->
+          <if test="page.key.year != null and page.key.year != ''">
+              and a.year = #{page.key.year}
+          </if>
+        order by
+        a.id
+        <!--分页查询-->
+      
+        limit  #{page.startNum} , #{page.pageSize}
+    </select>
+     <!--分页查询条数-->
+    <select id="getPageListCount" resultType="int">
+        select count(a.id) as count from graduate a , users b where  a.user_id=b.id
+        <!--排序 desc是降序-->
+        <!--专业搜索 不为空 则进入搜索条件-->
+        <if test="page.key.professionId != null ">
+            and a.profession_id = #{page.key.professionId}
+        </if>
+        <!--班级搜索 不为空 则进入搜索条件-->
+        <if test="page.key.classeId != null ">
+            and a.classe_id = #{page.key.classeId}
+        </if>
+        <!--是否结业搜索 不为空 则进入搜索条件-->
+        <if test="page.key.status != null ">
+            and a.status = #{page.key.status}
+        </if>
+        <!--年份搜索 不为空 则进入搜索条件-->
+        <if test="page.key.year != null and page.key.year != ''">
+            and a.year = #{page.key.year}
+        </if>
+    </select>
+
+   
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update graduate
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="intermediate != null and intermediate != ''">
+                intermediate = #{intermediate},
+            </if>
+            <if test="advanced != null and advanced != ''">
+                advanced = #{advanced},
+            </if>
+            <if test="levelFour != null and levelFour != ''">
+                level_four = #{levelFour},
+            </if>
+            <if test="levelSix != null and levelSix != ''">
+                level_six = #{levelSix},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="classeId != null">
+                classe_id = #{classeId},
+            </if>
+            <if test="professionId != null">
+                profession_id = #{professionId},
+            </if>
+            <if test="certificate != null and certificate != ''">
+                certificate = #{certificate},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from graduate where id = #{id}
+    </delete>
+    <select id="getByUserId" resultMap="GraduateMap">
+        select * from graduate where user_id=#{userId};
+    </select>
+    <update id="updateByUserId">
+        update   graduate
+        <set>
+            <if test="intermediate != null and intermediate != ''">
+                intermediate = #{intermediate},
+            </if>
+            <if test="advanced != null and advanced != ''">
+                advanced = #{advanced},
+            </if>
+            <if test="levelFour != null and levelFour != ''">
+                level_four = #{levelFour},
+            </if>
+            <if test="levelSix != null and levelSix != ''">
+                level_six = #{levelSix},
+            </if>
+            <if test="certificate != null and certificate != ''">
+                certificate = #{certificate},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+</mapper>
+
